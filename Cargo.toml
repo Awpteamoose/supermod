@@ -1,0 +1,17 @@
+[package]
+name = "supermod"
+version = "0.1.0"
+edition = "2018"
+description = "convenient automatic submodule import"
+license = "CC0-1.0"
+authors = ["Awpteamoose <cargo@awpteamoose.my.to>"]
+repository = "https://github.com/Awpteamoose/supermod"
+readme = "README.md"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "0.15"
+proc-macro2 = "0.4"
+proc-quote = "0.2"
