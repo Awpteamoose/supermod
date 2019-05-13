@@ -1,6 +1,6 @@
 extern crate proc_macro;
-use proc_macro2::{TokenStream, Span};
-use proc_quote::{quote, quote_spanned};
+use proc_macro2::Span;
+use proc_quote::quote;
 use syn::Ident;
 
 #[proc_macro]
@@ -10,16 +10,18 @@ pub fn supermod(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
 	let path = &path_string[1..path_string.len() - 1];
 	// get just the module name
 	let module_name = Ident::new(&path[path.find("/").map(|x| x + 1).unwrap_or(0)..], Span::call_site());
-	let files = std::fs::read_dir(path).unwrap().map(|x| {
+	// turn all files in the subfolder into submodule names
+	let idents = std::fs::read_dir(path).unwrap().map(|x| {
 		let path = x.unwrap().path();
 		let name = path.file_stem().unwrap().to_string_lossy();
-		let ident = Ident::new(&name, Span::call_site());
-		quote!(pub mod #ident;)
-	});
+		Ident::new(&name, Span::call_site())
+	}).collect::<Vec<_>>();
 
 	// gotta do this weird way if you want to use <module>.rs instead of mod.rs inside <module>
 	proc_macro::TokenStream::from(quote!(
-		mod #module_name { #(#files)* }
-		pub use #module_name::*;
+		mod #module_name { #(pub mod #idents;)* }
+		pub use #module_name::{
+			#(#idents,)*
+		};
 	))
 }

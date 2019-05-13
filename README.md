@@ -13,5 +13,10 @@ mod modname {
 	pub mod submod3;
 	...
 }
-pub use modname::*;
+pub use modname::{
+	submod1,
+	submod2,
+	submod3,
+	...
+};
 ```
